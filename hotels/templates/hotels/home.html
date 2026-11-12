@@ -1,0 +1,250 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ka">
+
+<head>
+    <meta charset="utf-8">
+    <title>მთავარი - სასტუმროს დაჯავშნა</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link href="{% static 'img/favicon.ico' %}" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost&family=Yeseva+One&family=Dancing+Script&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{% static 'lib/animate/animate.min.css' %}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Header Start -->
+    <div class="container-fluid p-0">
+        <nav class="navbar navbar-expand-lg navbar-dark px-lg-5 bg-dark">
+            <a href="{% url 'home' %}" class="navbar-brand ms-4 ms-lg-0">
+                <h1 class="mb-0 text-primary">CheckIn.ge</h1>
+            </a>
+            <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <div class="navbar-nav mx-auto p-4 p-lg-0">
+                    <a href="{% url 'home' %}" class="nav-item nav-link active">მთავარი</a>
+                    <a href="{% url 'hotel_list' %}" class="nav-item nav-link">სასტუმროები</a>
+                    <a href="{% url 'all_rooms' %}" class="nav-item nav-link">ყველა ნომერი</a>
+                    
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'booked_rooms_list' %}" class="nav-item nav-link">ჩემი ჯავშნები</a>
+                    {% endif %}
+                </div>
+
+                <div class="navbar-nav ms-auto align-items-center">
+                    {% if request.user.is_authenticated %}
+                        <span class="text-light me-3">გამარჯობა, <strong>{{ request.user.username }}</strong></span>
+                        <form action="{% url 'logout' %}" method="POST" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm px-3">გამოსვლა</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="nav-item nav-link">შესვლა</a>
+                        <a href="{% url 'register' %}" class="btn btn-primary px-3 ms-2">რეგისტრაცია</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        <!-- Carousel / Banner -->
+        <div id="header-carousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img class="w-100" src="{% static 'img/carousel-1.jpg' %}" alt="Image" style="height: 600px; object-fit: cover;">
+                    <div class="carousel-caption">
+                        <div class="row h-100 align-items-center justify-content-center">
+                            <div class="col-10 col-md-8">
+                                <h1 class="display-1 text-white animated slideInDown">არჩევანი დიდია, დაჯავშნა - მარტივი</h1>
+                                <p class="fs-3 mb-5 animated slideInDown">შეადარე ათასობით სასტუმრო და იპოვნე იდეალური ნომერი საუკეთესო ფასად.</p>
+                                <a href="{% url 'all_rooms' %}" class="btn btn-primary py-3 px-4 animated slideInDown">ნომრების ნახვა</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Header End -->
+
+
+    <!-- Room Start (Favorite Rooms) -->
+    <div class="container-fluid py-6">
+        <div class="container">
+            <div class="text-center mx-auto wow fadeIn" data-wow-delay="0.1s" style="max-width: 700px;">
+                <p class="fs-4 font-dancing-script text-primary mb-0">Best Rooms</p>
+                <h1 class="display-4 mb-5">საუკეთესო ნომრები</h1>
+            </div>
+            
+            <div class="row g-4">
+                {% for room in favorite_rooms %}
+                    <div class="col-lg-6 col-xl-4 wow fadeIn" data-wow-delay="0.1s">
+                        <div class="room-item bg-white rounded d-flex h-100 p-4 shadow-sm border">
+                            <div class="bg-light rounded overflow-hidden flex-shrink-0 d-flex flex-column justify-content-between text-center pb-4 me-3" style="width: 90px">
+                                <div class="bg-primary text-white py-3">
+                                    <h6 class="text-white mb-0">{{ room.price_per_night }} ₾</h6>
+                                    <small>ღამე</small>
+                                </div>
+                                    <p class="small mb-0">{{ room.get_room_type_display }}</p>
+                                <div class="text-center mx-auto">
+                                    <i class="fa fa-bed text-primary"></i>
+                                    <p class="small mb-0">{{ room.capacity }} სტუმარი</p>
+                                </div>
+                            </div>
+                            <div class="room-detail w-100 d-flex flex-column">
+                                <!-- ფოტო ბმულით დეტალურ გვერდზე -->
+                                <div class="position-relative rounded overflow-hidden mb-3" style="height: 160px;">
+                                    {% if room.image %}
+                                        <a href="{% url 'room_detail' room.id %}">
+                                            <img class="img-fluid w-100 h-100" src="{{ room.image.url }}" alt="{{ room.title }}" style="object-fit: cover;">
+                                        </a>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- სათაური ბმულით დეტალურ გვერდზე -->
+                                <a href="{% url 'room_detail' room.id %}" class="h5 d-inline-block text-dark text-decoration-none">{{ room.title }}</a>
+                                <p class="text-muted small mb-2">სასტუმრო: <strong>{{ room.hotel.name }}</strong> ({{ room.hotel.city }})</p>
+                                
+                                <!-- ღილაკები: დეტალები და დაჯავშნა -->
+                                <div class="mt-auto d-flex gap-2 pt-2">
+                                    <a href="{% url 'room_detail' room.id %}" class="btn btn-outline-primary w-50 py-2">დეტალები</a>
+                                    <a href="{% url 'book_room' room.id %}" class="btn btn-primary w-50 py-2">დაჯავშნა</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-center">
+                        <p class="text-muted">ფავორიტი ნომრები ჯერ არ არის მონიშნული ადმინ-პანელიდან.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- Room End -->
+     
+
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-light footer pt-5 mt-5 wow fadeIn" data-wow-delay="0.1s">
+        <div class="container py-5">
+            <div class="row g-5">
+                <!-- კავშირი -->
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-white mb-4">დაგვიკავშირდით</h4>
+                    <p class="mb-2"><i class="fa fa-map-marker-alt text-primary me-2"></i>საქართველო, რუსთავი / თბილისი</p>
+                    <p class="mb-2"><i class="fa fa-phone-alt text-primary me-2"></i>+995 500 00 00 00</p>
+                    <p class="mb-2"><i class="fa fa-envelope text-primary me-2"></i>info@checkin.ge</p>
+                    <div class="d-flex pt-2">
+                        <span class="btn btn-outline-light btn-social me-2"><i class="fab fa-twitter"></i></span>
+                        <span class="btn btn-outline-light btn-social me-2"><i class="fab fa-facebook-f"></i></span>
+                        <span class="btn btn-outline-light btn-social me-2"><i class="fab fa-youtube"></i></span>
+                        <span class="btn btn-outline-light btn-social"><i class="fab fa-linkedin-in"></i></span>
+                    </div>
+                </div>
+
+                <!-- სწრაფი ბმულები -->
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-white mb-4">სწრაფი ბმულები</h4>
+                    <a class="btn btn-link" href="{% url 'home' %}">მთავარი</a>
+                    <a class="btn btn-link" href="{% url 'hotel_list' %}">სასტუმროები</a>
+                    <a class="btn btn-link" href="{% url 'all_rooms' %}">ყველა ნომერი</a>
+                    {% if request.user.is_authenticated %}
+                        <a class="btn btn-link" href="{% url 'booked_rooms_list' %}">ჩემი ჯავშნები</a>
+                    {% endif %}
+                </div>
+
+                <!-- გალერეა -->
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-white mb-4">გალერეა</h4>
+                    <div class="row g-2 pt-2">
+                        <div class="col-4">
+                            <img class="img-fluid bg-light p-1 rounded" src="{% static 'img/room-1.jpg' %}" alt="">
+                        </div>
+                        <div class="col-4">
+                            <img class="img-fluid bg-light p-1 rounded" src="{% static 'img/room-2.jpg' %}" alt="">
+                        </div>
+                        <div class="col-4">
+                            <img class="img-fluid bg-light p-1 rounded" src="{% static 'img/room-3.jpg' %}" alt="">
+                        </div>
+                        <div class="col-4">
+                            <img class="img-fluid bg-light p-1 rounded" src="{% static 'img/room-2.jpg' %}" alt="">
+                        </div>
+                        <div class="col-4">
+                            <img class="img-fluid bg-light p-1 rounded" src="{% static 'img/room-3.jpg' %}" alt="">
+                        </div>
+                        <div class="col-4">
+                            <img class="img-fluid bg-light p-1 rounded" src="{% static 'img/room-1.jpg' %}" alt="">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- სიახლეები / გამოწერა -->
+                <div class="col-lg-3 col-md-6">
+                    <h4 class="text-white mb-4">სიახლეები</h4>
+                    <p>გამოიწერეთ ჩვენი სიახლეები და მიიღეთ საუკეთესო შეთავაზებები პირველებმა.</p>
+                    <div class="position-relative mx-auto" style="max-width: 400px;">
+                        <input class="form-control border-primary w-100 py-3 ps-4 pe-5" type="text" placeholder="თქვენი ელ-ფოსტა">
+                        <button type="button" class="btn btn-primary py-2 position-absolute top-0 end-0 mt-2 me-2">გაგზავნა</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Copyright -->
+        <div class="container">
+            <div class="copyright">
+                <div class="row">
+                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                        &copy; <a class="border-bottom text-white" href="{% url 'home' %}">CheckIn.ge</a>, All Right Reserved.
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <div class="footer-menu">
+                            <a href="{% url 'home' %}">მთავარი</a>
+                            <a href="{% url 'hotel_list' %}">სასტუმროები</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/wow/wow.min.js' %}"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+
+    <!-- Template Javascript -->
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>

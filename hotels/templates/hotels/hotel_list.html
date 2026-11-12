@@ -1,0 +1,193 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ka">
+
+<head>
+    <meta charset="utf-8">
+    <title>სასტუმროები - სასტუმროს დაჯავშნა</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <!-- Favicon -->
+    <link href="{% static 'img/favicon.ico' %}" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jost&family=Yeseva+One&family=Dancing+Script&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{% static 'lib/animate/animate.min.css' %}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Header Start -->
+    <div class="container-fluid p-0">
+        <nav class="navbar navbar-expand-lg navbar-dark px-lg-5 bg-dark">
+            <a href="{% url 'home' %}" class="navbar-brand ms-4 ms-lg-0">
+                <h1 class="mb-0 text-primary">CheckIn.ge</h1>
+            </a>
+            <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <div class="navbar-nav mx-auto p-4 p-lg-0">
+                    <a href="{% url 'home' %}" class="nav-item nav-link">მთავარი</a>
+                    <a href="{% url 'hotel_list' %}" class="nav-item nav-link active">სასტუმროები</a>
+                    <a href="{% url 'all_rooms' %}" class="nav-item nav-link">ყველა ნომერი</a>
+                    
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'booked_rooms_list' %}" class="nav-item nav-link">ჩემი ჯავშნები</a>
+                    {% endif %}
+                </div>
+
+                <div class="navbar-nav ms-auto align-items-center">
+                    {% if request.user.is_authenticated %}
+                        <span class="text-light me-3">გამარჯობა, <strong>{{ request.user.username }}</strong></span>
+                        <form action="{% url 'logout' %}" method="POST" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm px-3">გამოსვლა</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="nav-item nav-link">შესვლა</a>
+                        <a href="{% url 'register' %}" class="btn btn-primary px-3 ms-2">რეგისტრაცია</a>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+    </div>
+    <!-- Header End -->
+
+
+    <!-- Page Header Start -->
+    <div class="container-fluid page-header py-5 mb-5 wow fadeIn" data-wow-delay="0.1s" style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/static/img/carousel-1.jpg') center center no-repeat; background-size: cover;">
+        <div class="container text-center py-5">
+            <h1 class="display-3 text-white mb-3 animated slideInDown">სასტუმროები</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb justify-content-center text-uppercase">
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white">მთავარი</a></li>
+                    <li class="breadcrumb-item text-primary active" aria-current="page">სასტუმროები</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <!-- Page Header End -->
+
+
+    <!-- Hotels List Start -->
+    <div class="container-fluid py-6">
+        <div class="container">
+            <div class="text-center mx-auto wow fadeIn mb-5" data-wow-delay="0.1s" style="max-width: 600px;">
+                <p class="fs-4 font-dancing-script text-primary mb-0">Our Partners</p>
+                <h1 class="display-4 mb-0">აღმოაჩინე საუკეთესო სასტუმროები</h1>
+            </div>
+            
+            <!-- ქალაქის ფილტრის ფორმა -->
+            <form method="GET" class="bg-light p-4 rounded mb-5 shadow-sm border">
+                <div class="row g-3 align-items-end justify-content-center">
+                    <div class="col-md-4">
+                        <label class="form-label small font-weight-bold">ქალაქი:</label>
+                        <select name="city" class="form-select">
+                            <option value="">ყველა ქალაქი</option>
+                            {% for c in cities %}
+                                <option value="{{ c }}" {% if selected_city == c %}selected{% endif %}>{{ c }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100 py-2"><i class="fa fa-search me-2"></i>ძებნა</button>
+                    </div>
+                    {% if selected_city %}
+                        <div class="col-md-2">
+                            <a href="{% url 'hotel_list' %}" class="btn btn-outline-secondary w-100 py-2">გასუფთავება</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </form>
+
+            <div class="row g-4">
+                {% for hotel in hotels %}
+                    <div class="col-lg-4 col-md-6 wow fadeIn" data-wow-delay="0.1s">
+                        <div class="card h-100 shadow-sm border-0 rounded overflow-hidden">
+                            {% if hotel.image %}
+                                <img src="{{ hotel.image.url }}" class="card-img-top" alt="{{ hotel.name }}" style="height: 220px; object-fit: cover;">
+                            {% endif %}
+                            <div class="card-body d-flex flex-column p-4">
+                                <h4 class="card-title text-dark mb-2">{{ hotel.name }}</h4>
+                                <p class="text-muted small mb-2"><i class="fa fa-map-marker-alt text-primary me-2"></i>{{ hotel.city }}</p>
+                                <p class="card-text text-muted mb-4">{{ hotel.description|truncatechars:100 }}</p>
+                                <div class="mt-auto">
+                                    <a href="{% url 'hotel_detail' hotel.id %}" class="btn btn-primary w-100 py-2">ნომრების ნახვა / დეტალები</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted fs-5">სასტუმროები ჯერ არ არის დამატებული.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination Start -->
+            <div class="col-12 text-center mt-5 wow fadeIn" data-wow-delay="0.1s">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center mb-0">
+                        <!-- წინა გვერდის ღილაკი (აქტიურია მხოლოდ მაშინ, თუ წინა გვერდი არსებობს) -->
+                        <li class="page-item {% if not hotels.has_previous %}disabled{% endif %}">
+                            <a class="page-link" {% if hotels.has_previous %}href="?page={{ hotels.previous_page_number }}{% if selected_city %}&city={{ selected_city }}{% endif %}"{% endif %} aria-label="Previous">
+                                <span aria-hidden="true">&laquo; წინა</span>
+                            </a>
+                        </li>
+
+                        <!-- გვერდების ნომრები (ყოველთვის გამოჩნდება, თუნდაც ერთადერთი იყოს) -->
+                        {% for num in hotels.paginator.page_range %}
+                            <li class="page-item {% if hotels.number == num %}active{% endif %}">
+                                <a class="page-link" href="?page={{ num }}{% if selected_city %}&city={{ selected_city }}{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+
+                        <!-- შემდეგი გვერდის ღილაკი (აქტიურია მხოლოდ მაშინ, თუ შემდეგი გვერდი არსებობს) -->
+                        <li class="page-item {% if not hotels.has_next %}disabled{% endif %}">
+                            <a class="page-link" {% if hotels.has_next %}href="?page={{ hotels.next_page_number }}{% if selected_city %}&city={{ selected_city }}{% endif %}"{% endif %} aria-label="Next">
+                                <span aria-hidden="true">შემდეგი &raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <!-- Pagination End -->
+        </div>
+    </div>
+    <!-- Hotels List End -->
+
+
+    <!-- Footer Start -->
+    <div class="container-fluid bg-dark text-light footer pt-5 wow fadeIn" data-wow-delay="0.1s">
+        <div class="container py-4 text-center">
+            <p class="mb-0">&copy; CheckIn.ge Hotel Booking. All Rights Reserved.</p>
+        </div>
+    </div>
+    <!-- Footer End -->
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/wow/wow.min.js' %}"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>
