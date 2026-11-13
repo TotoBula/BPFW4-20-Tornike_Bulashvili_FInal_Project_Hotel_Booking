@@ -74,17 +74,17 @@ def book_room(request, room_id):
     check_in = datetime.strptime(check_in_str, '%Y-%m-%d').date()
     check_out = datetime.strptime(check_out_str, '%Y-%m-%d').date()
 
-    # 0. შევამოწმოთ, რომ შესვლის თარიღი არ იყოს წარსულში
+    # შევამოწმოთ, რომ შესვლის თარიღი არ იყოს წარსულში
     if check_in < datetime.now().date():
       error_message = (
           'წარსული თარიღით დაჯავშნა შეუძლებელია! გთხოვთ აირჩიოთ მომავალი დღე.'
       )
 
-    # 1. შევამოწმოთ, რომ გასვლის თარიღი შესვლაზე გვიანია
+    # შევამოწმოთ, რომ გასვლის თარიღი შესვლაზე გვიანია
     elif check_out <= check_in:
       error_message = 'გასვლის თარიღი უნდა იყოს შესვლის თარიღზე გვიანი!'
     else:
-      # 2. შევამოწმოთ, არის თუ არა ეს ოთახი უკვე დაკავებული ამ თარიღებში
+      # შევამოწმოთ, არის თუ არა ეს ოთახი უკვე დაკავებული ამ თარიღებში
       overlapping_bookings = Booking.objects.filter(
           room=room, check_in__lt=check_out, check_out__gt=check_in
       )
@@ -128,14 +128,10 @@ def booking_success(request, booking_id):
   return render(request, 'hotels/booking_success.html', {'booking': booking})
 
 def home_view(request):
-    # ვფილტრავთ ფავორიტ ნომრებს, ვლაგებთ ახლიდან ძველისკენ და ვზღუდავთ მაქსიმუმ 12-ით
+    # ვფილტრავთ ფავორიტ ნომრებს, ვლაგებთ ახლიდან ძველისკენ მაქსიმუმ 12
     favorite_rooms = Room.objects.filter(is_favorite=True).order_by('-id')[:12]
     
     return render(request, 'hotels/home.html', {'favorite_rooms': favorite_rooms})
-
-
-
-
 
 
 def all_rooms(request):
@@ -147,23 +143,23 @@ def all_rooms(request):
     max_price = request.GET.get('max_price', '')
     check_in_str = request.GET.get('check_in', '')
     check_out_str = request.GET.get('check_out', '')
-    city = request.GET.get('city', '')  # ქალაქის პარამეტრი
+    city = request.GET.get('city', '')  # GET პარამეტრი ქალაქისთვის
 
-    # 1. ფილტრაცია ტიპის მიხედვით
+    # ფილტრაცია ტიპის მიხედვით
     if room_type:
         rooms = rooms.filter(room_type=room_type)
 
-    # 2. ფილტრაცია ქალაქის მიხედვით (Hotel მოდელის გავლით)
+    # ფილტრაცია ქალაქის მიხედვით (Hotel მოდელის გავლით)
     if city:
         rooms = rooms.filter(hotel__city__icontains=city)
 
-    # 3. ფილტრაცია ფასის დიაპაზონით
+    # ფილტრაცია ფასის დიაპაზონით
     if min_price:
         rooms = rooms.filter(price_per_night__gte=min_price)
     if max_price:
         rooms = rooms.filter(price_per_night__lte=max_price)
 
-    # 4. ფილტრაცია თავისუფალი თარიღების მიხედვით
+    # ფილტრაცია თავისუფალი თარიღების მიხედვით
     if check_in_str and check_out_str:
         try:
             check_in = datetime.strptime(check_in_str, '%Y-%m-%d').date()
@@ -189,7 +185,7 @@ def all_rooms(request):
     cities = Hotel.objects.values_list('city', flat=True).distinct()
 
     context = {
-        'rooms': page_obj,  # <--- ვუშვებთ გვერდების ობიექტს
+        'rooms': page_obj,  # ვუშვებთ გვერდების ობიექტს
         'room_types': Room.ROOM_TYPES,
         'cities': cities,
         'selected_type': room_type,
@@ -221,7 +217,7 @@ def booked_rooms_list(request):
   return render(request, 'hotels/booked_rooms.html', context)
 
 
-# ჯავშნის გაუქმების (Cancel) ფუნქცია
+# ჯავშნის გაუქმების ფუნქცია
 def cancel_booking(request, booking_id):
   booking = get_object_or_404(Booking, pk=booking_id)
   if request.method == 'POST':

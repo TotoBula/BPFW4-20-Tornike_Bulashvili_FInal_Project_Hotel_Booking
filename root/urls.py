@@ -34,7 +34,7 @@ urlpatterns = [
     path('booked-rooms/', views.booked_rooms_list, name='booked_rooms_list'),
     path('booked-rooms/cancel/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
 
-    # 👇 ავტორიზაციის და რეგისტრაციის მისამართები, რომლებიც აკლდა:
+    # ავტორიზაციის და რეგისტრაციის მისამართები, რომლებიც აკლდა:
     path('register/', views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='hotels/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
