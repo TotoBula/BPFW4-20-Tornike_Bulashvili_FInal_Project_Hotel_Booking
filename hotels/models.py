@@ -11,6 +11,14 @@ class Hotel(models.Model):
         return f"{self.name} ({self.city})"
 
 
+class HotelImage(models.Model):
+    hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='images', verbose_name="სასტუმრო")
+    image = models.ImageField(upload_to='hotels/gallery/', verbose_name="ფოტო")
+
+    def __str__(self):
+        return f"Photo for {self.hotel.name}"
+
+
 class Room(models.Model):
     ROOM_TYPES = (
         ('standard', 'სტანდარტული (Standard)'),
@@ -31,14 +39,9 @@ class Room(models.Model):
         return f"{self.title} - {self.hotel.name}"
 
 
-class Booking(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE, verbose_name="ნომერი")
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="მომხმარებელი")
-    check_in = models.DateField(verbose_name="შესვლის თარიღი")
-    check_out = models.DateField(verbose_name="გასვლის თარიღი")
-    total_price = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="ჯამური ფასი")
-    created_at = models.DateTimeField(auto_now_add=True)
+class RoomImage(models.Model):
+    room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='images', verbose_name="ნომერი")
+    image = models.ImageField(upload_to='rooms/gallery/', verbose_name="ფოტო")
 
     def __str__(self):
-        return f"{self.user.username} - {self.room.title}"
-
+        return f"Photo for {self.room.title}"

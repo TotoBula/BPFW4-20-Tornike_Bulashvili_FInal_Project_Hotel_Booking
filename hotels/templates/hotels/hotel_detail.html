@@ -34,7 +34,7 @@
     <!-- Header Start -->
     <div class="container-fluid p-0">
         <nav class="navbar navbar-expand-lg navbar-dark px-lg-5 bg-dark">
-            <a href="{% url 'home' %}" class="navbar-brand ms-4 ms-lg-0">
+            <a href="{% url 'hotels:home' %}" class="navbar-brand ms-4 ms-lg-0">
                 <h1 class="mb-0 text-primary">CheckIn.ge</h1>
             </a>
             <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -42,25 +42,25 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <div class="navbar-nav mx-auto p-4 p-lg-0">
-                    <a href="{% url 'home' %}" class="nav-item nav-link">მთავარი</a>
-                    <a href="{% url 'hotel_list' %}" class="nav-item nav-link active">სასტუმროები</a>
-                    <a href="{% url 'all_rooms' %}" class="nav-item nav-link">ყველა ნომერი</a>
+                    <a href="{% url 'hotels:home' %}" class="nav-item nav-link">მთავარი</a>
+                    <a href="{% url 'hotels:hotel_list' %}" class="nav-item nav-link active">სასტუმროები</a>
+                    <a href="{% url 'hotels:all_rooms' %}" class="nav-item nav-link">ყველა ნომერი</a>
                     
                     {% if request.user.is_authenticated %}
-                        <a href="{% url 'booked_rooms_list' %}" class="nav-item nav-link">ჩემი ჯავშნები</a>
+                        <a href="{% url 'bookings:booked_rooms_list' %}" class="nav-item nav-link">ჩემი ჯავშნები</a>
                     {% endif %}
                 </div>
 
                 <div class="navbar-nav ms-auto align-items-center">
                     {% if request.user.is_authenticated %}
                         <span class="text-light me-3">გამარჯობა, <strong>{{ request.user.username }}</strong></span>
-                        <form action="{% url 'logout' %}" method="POST" class="d-inline">
+                        <form action="{% url 'users:logout' %}" method="POST" class="d-inline">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger btn-sm px-3">გამოსვლა</button>
                         </form>
                     {% else %}
-                        <a href="{% url 'login' %}" class="nav-item nav-link">შესვლა</a>
-                        <a href="{% url 'register' %}" class="btn btn-primary px-3 ms-2">რეგისტრაცია</a>
+                        <a href="{% url 'users:login' %}" class="nav-item nav-link">შესვლა</a>
+                        <a href="{% url 'users:register' %}" class="btn btn-primary px-3 ms-2">რეგისტრაცია</a>
                     {% endif %}
                 </div>
             </div>
@@ -75,8 +75,8 @@
             <h1 class="display-3 text-white mb-3 animated slideInDown">{{ hotel.name }}</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb justify-content-center text-uppercase">
-                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white">მთავარი</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'hotel_list' %}" class="text-white">სასტუმროები</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'hotels:home' %}" class="text-white">მთავარი</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'hotels:hotel_list' %}" class="text-white">სასტუმროები</a></li>
                     <li class="breadcrumb-item text-primary active" aria-current="page">დეტალები</li>
                 </ol>
             </nav>
@@ -89,7 +89,7 @@
     <div class="container-fluid py-6">
         <div class="container">
             <div class="mb-4">
-                <a href="{% url 'hotel_list' %}" class="text-decoration-none text-primary"><i class="fa fa-arrow-left me-2"></i>სასტუმროების სიაში დაბრუნება</a>
+                <a href="{% url 'hotels:hotel_list' %}" class="text-decoration-none text-primary"><i class="fa fa-arrow-left me-2"></i>სასტუმროების სიაში დაბრუნება</a>
             </div>
 
             <!-- Hotel Info Card -->
@@ -98,7 +98,28 @@
                 <p class="text-muted mb-3"><i class="fa fa-map-marker-alt text-primary me-2"></i><strong>მისამართი:</strong> {{ hotel.address }} (ქ. {{ hotel.city }})</p>
                 <p class="text-secondary lead fs-6 mb-0">{{ hotel.description }}</p>
             </div>
+           <!-- სასტუმროს მთავარი ფოტო -->
+            {% if hotel.image %}
+                <div class="hotel-main-image" style="margin-bottom: 20px;">
+                    <a href="{{ hotel.image.url }}" target="_blank">
+                        <img src="{{ hotel.image.url }}" alt="{{ hotel.name }}" style="max-width: 100%; height: 350px; object-fit: cover; border-radius: 12px; cursor: pointer;">
+                    </a>
+                </div>
+            {% endif %}
 
+            <!-- სასტუმროს დამატებითი ფოტოების გალერეა -->
+            <h3>სასტუმროს გალერეა</h3>
+            <div class="hotel-gallery" style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
+                {% for img in hotel.images.all %}
+                    <div class="gallery-item">
+                        <a href="{{ img.image.url }}" target="_blank">
+                            <img src="{{ img.image.url }}" alt="Hotel Gallery Photo" style="width: 220px; height: 160px; object-fit: cover; border-radius: 8px; cursor: pointer;">
+                        </a>
+                    </div>
+                {% empty %}
+                    <p>დამატებითი ფოტოები არ არის.</p>
+                {% endfor %}
+            </div>
             <div class="text-center mx-auto mb-5 wow fadeIn" data-wow-delay="0.1s" style="max-width: 600px;">
                 <p class="fs-4 font-dancing-script text-primary mb-0">Available Rooms</p>
                 <h1 class="display-4 mb-0">თავისუფალი ნომრები</h1>
@@ -112,14 +133,14 @@
                             <!-- ფოტო ბმულით დეტალურ გვერდზე -->
                             {% if room.image %}
                                 <div class="position-relative rounded overflow-hidden mb-3" style="height: 200px;">
-                                    <a href="{% url 'room_detail' room.id %}">
+                                    <a href="{% url 'hotels:room_detail' room.id %}">
                                         <img class="img-fluid w-100 h-100" src="{{ room.image.url }}" alt="{{ room.title }}" style="object-fit: cover;">
                                     </a>
                                 </div>
                             {% endif %}
 
                             <!-- სათაური ბმულით დეტალურ გვერდზე -->
-                            <a href="{% url 'room_detail' room.id %}" class="text-decoration-none text-dark">
+                            <a href="{% url 'hotels:room_detail' room.id %}" class="text-decoration-none text-dark">
                                 <h4 class="h5 mb-2">ნომერი: {{ room.title }}</h4>
                             </a>
 
@@ -130,8 +151,8 @@
                             
                             <!-- ღილაკები: დეტალები და დაჯავშნა -->
                             <div class="mt-auto d-flex gap-2">
-                                <a href="{% url 'room_detail' room.id %}" class="btn btn-outline-primary w-50 py-2">დეტალები</a>
-                                <a href="{% url 'book_room' room.id %}" class="btn btn-primary w-50 py-2">დაჯავშნა</a>
+                                <a href="{% url 'hotels:room_detail' room.id %}" class="btn btn-outline-primary w-50 py-2">დეტალები</a>
+                                <a href="{% url 'bookings:book_room' room.id %}" class="btn btn-primary w-50 py-2">დაჯავშნა</a>
                             </div>
                         </div>
                     </div>

@@ -34,7 +34,7 @@
     <!-- Header Start -->
     <div class="container-fluid p-0">
         <nav class="navbar navbar-expand-lg navbar-dark px-lg-5 bg-dark">
-            <a href="{% url 'home' %}" class="navbar-brand ms-4 ms-lg-0">
+            <a href="{% url 'hotels:home' %}" class="navbar-brand ms-4 ms-lg-0">
                 <h1 class="mb-0 text-primary">CheckIn.ge</h1>
             </a>
             <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
@@ -42,25 +42,25 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarCollapse">
                 <div class="navbar-nav mx-auto p-4 p-lg-0">
-                    <a href="{% url 'home' %}" class="nav-item nav-link">მთავარი</a>
-                    <a href="{% url 'hotel_list' %}" class="nav-item nav-link">სასტუმროები</a>
-                    <a href="{% url 'all_rooms' %}" class="nav-item nav-link">ყველა ნომერი</a>
+                    <a href="{% url 'hotels:home' %}" class="nav-item nav-link">მთავარი</a>
+                    <a href="{% url 'hotels:hotel_list' %}" class="nav-item nav-link">სასტუმროები</a>
+                    <a href="{% url 'hotels:all_rooms' %}" class="nav-item nav-link">ყველა ნომერი</a>
                     
                     {% if request.user.is_authenticated %}
-                        <a href="{% url 'booked_rooms_list' %}" class="nav-item nav-link active">ჩემი ჯავშნები</a>
+                        <a href="{% url 'bookings:booked_rooms_list' %}" class="nav-item nav-link active">ჩემი ჯავშნები</a>
                     {% endif %}
                 </div>
 
                 <div class="navbar-nav ms-auto align-items-center">
                     {% if request.user.is_authenticated %}
                         <span class="text-light me-3">გამარჯობა, <strong>{{ request.user.username }}</strong></span>
-                        <form action="{% url 'logout' %}" method="POST" class="d-inline">
+                        <form action="{% url 'users:logout' %}" method="POST" class="d-inline">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-danger btn-sm px-3">გამოსვლა</button>
                         </form>
                     {% else %}
-                        <a href="{% url 'login' %}" class="nav-item nav-link">შესვლა</a>
-                        <a href="{% url 'register' %}" class="btn btn-primary px-3 ms-2">რეგისტრაცია</a>
+                        <a href="{% url 'users:login' %}" class="nav-item nav-link">შესვლა</a>
+                        <a href="{% url 'users:register' %}" class="btn btn-primary px-3 ms-2">რეგისტრაცია</a>
                     {% endif %}
                 </div>
             </div>
@@ -75,7 +75,7 @@
             <h1 class="display-3 text-white mb-3 animated slideInDown">ჩემი ჯავშნები</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb justify-content-center text-uppercase">
-                    <li class="breadcrumb-item"><a href="{% url 'home' %}" class="text-white">მთავარი</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'hotels:home' %}" class="text-white">მთავარი</a></li>
                     <li class="breadcrumb-item text-primary active" aria-current="page">ჯავშნები</li>
                 </ol>
             </nav>
@@ -106,7 +106,7 @@
                 <div class="d-flex align-items-end gap-2 mt-3">
                     <button type="submit" class="btn btn-primary btn-sm px-3">ფილტრი</button>
                     {% if selected_city %}
-                        <a href="{% url 'booked_rooms_list' %}" class="btn btn-outline-danger btn-sm">გასუფთავება</a>
+                        <a href="{% url 'bookings:booked_rooms_list' %}" class="btn btn-outline-danger btn-sm">გასუფთავება</a>
                     {% endif %}
                 </div>
             </form>
@@ -144,7 +144,7 @@
                                 <td>{{ b.check_out|date:"d.m.Y" }}</td>
                                 <td><strong class="text-primary">{{ b.total_price }} ₾</strong></td>
                                 <td class="text-center">
-                                    <a href="{% url 'cancel_booking' b.id %}" class="btn btn-danger btn-sm px-3">ჯავშნის გაუქმება</a>
+                                    <a href="{% url 'bookings:cancel_booking' b.id %}" class="btn btn-danger btn-sm px-3">ჯავშნის გაუქმება</a>
                                 </td>
                             </tr>
                         {% empty %}
